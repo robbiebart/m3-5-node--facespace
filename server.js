@@ -13,12 +13,35 @@ const handleFourOhFour = (req, res) => {
 };
 
 const handleHomepage = (req, res) => {
-  res.status(200).render("pages/homepage", { users: users });
+  console.log(users);
+  res.status(200).render("pages/homepage", { users: users, myName: "Daniel" }); // what's happening here?
+};
+/*
+render is for ejs, it looks for the ejs file. it tries to display that view. so pages/homepage 
+displays homepage.ejs
+second parameter is an object that you can put anything into
+you can use my name in ejs file, it'll say what you tell it to be
+
+*/
+
+const getFriendsList = (friendIdList) => {
+  return friendIdList.map((friendId) => {
+    return users.find((user) => {
+      return user._id === friendId;
+    });
+  });
 };
 
 const handleProfilePage = (req, res) => {
-  const id = req.params.id;
-  res.send(id);
+  const _id = req.params._id;
+
+  let userObj = {};
+  userObj = users.find((user) => {
+    return user._id === _id;
+  });
+  let friends = getFriendsList(userObj.friends);
+  // res.send(_id);
+  res.render("pages/profiles", { user: userObj, friends });
 };
 
 // -----------------------------------------------------
@@ -32,7 +55,13 @@ express()
   // endpoints
   .get("/", handleHomepage)
 
-  .get("/users/:id", handleProfilePage)
+  .get("/users/:_id", handleProfilePage)
+  /*
+ : means a query parameter; 
+ on line 44 you have ":_id"
+ on line 28 you're accessing that by req.params._id
+ so im setting _id to whatever the user input in the url
+  */
 
   // a catchall endpoint that will send the 404 message.
   .get("*", handleFourOhFour)
