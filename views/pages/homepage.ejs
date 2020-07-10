@@ -5,9 +5,15 @@
 <ul class="homepage__all">
     <% users.forEach(user => { %>
     <li class="homepage__all--user">
-      <img src="<%= user.avatarUrl %>" />
+        <% if (currentUser.name === undefined || currentUser.friends.includes(user._id) === false) { %>
+            <a href=/users/<%=user._id%>><img src="<%= user.avatarUrl %>" /></a>
+        <% }  else  { %>
+            <span class="ribbon">Friend</span><a href=/users/<%=user._id%>><img src="<%= user.avatarUrl %>" /></a>
+        <% } %>
     </li>
     <% }) %>
   </ul>
 
 <%- include( '../partials/footer') %>
+
+<!-- array.includes(element, start) -->

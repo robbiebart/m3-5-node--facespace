@@ -14,7 +14,9 @@ const handleFourOhFour = (req, res) => {
 
 const handleHomepage = (req, res) => {
   console.log(users);
-  res.status(200).render("pages/homepage", { users: users, myName: "Daniel" }); // what's happening here?
+  res
+    .status(200)
+    .render("pages/homepage", { users: users, myName: "Daniel", currentUser }); // what's happening here?
 };
 /*
 render is for ejs, it looks for the ejs file. it tries to display that view. so pages/homepage 
@@ -41,7 +43,30 @@ const handleProfilePage = (req, res) => {
   });
   let friends = getFriendsList(userObj.friends);
   // res.send(_id);
-  res.render("pages/profiles", { user: userObj, friends });
+  res.render("pages/profiles", { user: userObj, friends, currentUser });
+};
+
+const handleSignin = (req, res) => {
+  if (currentUser.name === undefined) {
+    res.render("pages/signin", { currentUser });
+  } else {
+    res.redirect("/");
+  }
+};
+
+const handleName = (req, res) => {
+  let firstName = req.body.firstName;
+  let foundUser = users.find((user) => {
+    return user.name === firstName;
+  });
+
+  currentUser = foundUser;
+
+  if (foundUser !== undefined) {
+    res.status(200).redirect("/users/" + foundUser._id);
+  } else {
+    res.status(404).redirect("/signin");
+  }
 };
 
 // -----------------------------------------------------
@@ -56,6 +81,10 @@ express()
   .get("/", handleHomepage)
 
   .get("/users/:_id", handleProfilePage)
+
+  .get("/signin", handleSignin)
+
+  .post("/getname", handleName)
   /*
  : means a query parameter; 
  on line 44 you have ":_id"
